@@ -1,0 +1,368 @@
+\documentclass[twoside]{article}
+\setlength{\oddsidemargin}{0.25 in}
+\setlength{\evensidemargin}{-0.25 in}
+\setlength{\topmargin}{-0.6 in}
+\setlength{\textwidth}{6.5 in}
+\setlength{\textheight}{8.5 in}
+\setlength{\headsep}{0.75 in}
+\setlength{\parindent}{0 in}
+\setlength{\parskip}{0.1 in}
+
+%
+% ADD PACKAGES here:
+%
+
+\usepackage{amsmath,amsthm,amssymb,amsfonts,graphicx}
+\graphicspath{ {images/} }
+\usepackage[utf8]{inputenc}
+\usepackage[ruled,vlined]{algorithm2e}
+\usepackage[export]{adjustbox}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\SetKwInput{KwInput}{Input}
+\SetKwInput{KwOutput}{Output}
+
+%
+% The following commands set up the lecnum (lecture number)
+% counter and make various numbering schemes work relative
+% to the lecture number.
+%
+\newcounter{lecnum}
+\renewcommand{\thepage}{\thelecnum-\arabic{page}}
+\renewcommand{\thesection}{\thelecnum.\arabic{section}}
+\renewcommand{\theequation}{\thelecnum.\arabic{equation}}
+\renewcommand{\thefigure}{\thelecnum.\arabic{figure}}
+\renewcommand{\thetable}{\thelecnum.\arabic{table}}
+
+%
+% The following macro is used to generate the header.
+%
+\newcommand{\lecture}[4]{%
+   \pagestyle{myheadings}
+   \thispagestyle{plain}
+   \newpage
+   \setcounter{lecnum}{#1}
+   \setcounter{page}{1}
+   \noindent
+   \begin{center}
+   \framebox{
+      \vbox{\vspace{2mm} \hbox to 6.28in { {\bf CS 763: Security and Privacy in Data Science \hfill Fall 2019} }
+       \vspace{4mm}
+       \hbox to 6.28in { {\Large \hfill Presentation #1: #2  \hfill} }
+       \vspace{2mm}
+       \hbox to 6.28in { {\it Presenters: #3 \hfill Scribes: #4} }
+      \vspace{2mm}}
+   }
+   \end{center}
+   \markboth{Presentation #1: #2}{Presentation #1: #2}
+}
+
+% Use these for theorems, lemmas, proofs, etc.
+\newtheorem{theorem}{Theorem}[lecnum]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{claim}[theorem]{Claim}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}[theorem]{Definition}
+
+%% mathbb
+
+\newcommand{\BB}{\mathbb{B}}
+\newcommand{\CC}{\mathbb{C}}
+\newcommand{\EE}{\mathbb{E}}
+\newcommand{\FF}{\mathbb{F}}
+\newcommand{\LL}{\mathbb{L}}
+\newcommand{\NN}{\mathbb{N}}
+\newcommand{\PP}{\mathbb{P}}
+\newcommand{\QQ}{\mathbb{Q}}
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\ZZ}{\mathbb{Z}}
+
+%% mathcal
+
+\def\cA{{\cal A}}
+\def\cB{{\cal B}}
+\def\cC{{\cal C}}
+\def\cD{{\cal D}}
+\def\cE{{\cal E}}
+\def\cF{{\cal F}}
+\def\cH{{\cal H}}
+\def\cI{{\cal I}}
+\def\cJ{{\cal J}}
+\def\cK{{\cal K}}
+\def\cL{{\cal L}}
+\def\cM{{\cal M}}
+\def\cN{{\cal N}}
+\def\cO{{\cal O}}
+\def\cP{{\cal P}}
+\def\cQ{{\cal Q}}
+\def\cR{{\cal R}}
+\def\cS{{\cal S}}
+\def\cT{{\cal T}}
+\def\cU{{\cal U}}
+\def\cV{{\cal V}}
+\def\cW{{\cal W}}
+\def\cX{{\cal X}}
+\def\cY{{\cal Y}}
+\def\cZ{{\cal Z}}
+
+% **** IF YOU WANT TO DEFINE ADDITIONAL MACROS FOR YOURSELF, PUT THEM HERE:
+
+\begin{document}
+%
+% **** FILL IN THE RIGHT INFO ****
+%
+%\lecture{**LECTURE-NUMBER**}{**TOPIC**}{**LECTURER**}{**SCRIBE**}
+\lecture{3}{Data Poisoning}{Somya Arora \& Zi Wang}{Pierre Petrella \& Miru Park}
+\section{}
+%\tableofcontents
+%\newpage
+\section*{How secure are our classifiers? }
+% ----------------- subsection---------------------
+\subsection{Introduction}
+\paragraph{}
+This is a summary based on the presentation given by Zi and Somya. They introduced a method with which supervised machine learning algorithms could be exploited by an "intelligent adversary". The method presented is known as poisoning attack. The name is derived from the fact that the adversary need only craft and inject one or a few malicious training examples to maximize the loss function of the machine learning algorithms in question, leading to higher classification error. The presentation was based on two reasonably recent papers: \textcolor{blue}{\href{https://arxiv.org/pdf/1804.00792.pdf}{paper1}} and \textcolor{green}{\href{https://arxiv.org/pdf/1206.6389.pdf}{paper2}}
+
+\subsection {potential threats of ML pipeline poisoning}
+\paragraph{}
+Machine learning systems have made itself necessary in this new data era requiring data analysis that can only be managed by automated processes. It is more precisely used for image recognition from distinguishing cats from dogs, red lights from green lights to facial recognition. 
+\paragraph{}
+Unfortunately these machine learning systems can be compromised. They are now becoming the weakest part of the security chain and consequently of the whole system. If no precautions are taken, this weakness can be used as a weapon by the attackers.
+
+% ----------------- subsection---------------------
+\subsection{General attack on a ML Pipeline}
+\includegraphics[scale=0.3]{MLpipeline.png}
+% ----------------- section------------------------
+\section{Targeted clean labor poisoning attacks on Neutral Networks}
+
+% ----------------- subsection---------------------
+\subsection{Assumptions}
+
+The attacker has:
+\begin{enumerate}
+  \item No knowledge of the training data
+  \item No control over the target instance during test time
+  \item No control over labelling of data for training
+  \item Knowledge of the model and it's parameters
+\end{enumerate}
+\paragraph{}
+These restriction are quite strict on the attacker. This implies that the data poisoning requires minimal intrusion which makes it difficult to detect for the ML model.
+% ----------------- subsection---------------------
+\subsection{Properties}
+
+\subsubsection*{Clean labels}
+\paragraph{}
+There are various types of poisoning attacks. In this paper, we are focusing on clean labels opposed to poisoning that involve tampering with the labels. clean labels allows to poison a training set with minimal intrusion as the poisoned image can simply be uploaded online and wait to be used by a ML model.
+
+\subsubsection*{Targeted}
+\paragraph{}
+This type of attack is built to affect one image specifically and not tamper with the other ones. This allows the poisoning to happen without the Users noticing that the model was tampered with. the Degradation of the model should be unnoticeable.
+\subsubsection*{good success rate}
+\paragraph{}
+If the poisoning is affecting the last more specific nodes of the ML model, we can assume that the poisoning will have a success rate of 100\% most of the time. 
+
+
+% ----------------- subsection---------------------
+\subsection{poisoning Attacks example}
+
+\paragraph
+We will be considering the Classifier that sorts between fish and dogs. The goal of the attacker will be to chose a specific picture of a fish and trick the ML model to think it is a dog. To do so he and insert a poisoned instance for fish class from dog a base instance. This poisoned picture which looks like a dog will be labeled accordingly and therefore trick the ML model.
+\paragraph{}
+Here are examples of poisoned dog images associated with the fish images they are targeting. We can see that the difference between the original and poisoned dog is indistinguishable to the human eye.   
+
+\includegraphics[scale=0.4]{ExamplePoisoning2.png}
+
+% ----------------- subsection---------------------
+\subsection{Transfer learning}
+\paragraph{}
+On way to train a new ML model is to use an existing working model that has been trained on a significantly big data set (Model A) and get rid of the last couple of layers. We then reconstruct the last layers using a relatively small data set to fine tune the model to distinguish cats and dogs for instance (Model B). 
+\includegraphics[scale=0.3]{MLTransfer.png}
+\paragraph{}
+These last layers are very susceptible to change making it an idea target for data poisoning. Transfer learning is an effective way to train a new model without requiring all the resources necessary to train a ML model from scratch. Unfortunately if the data set used to train the last layer has been tampered with classification accuracy can be easily tampered with. Here is another representation of Transfer learning. \\
+\includegraphics[scale=0.3]{MLTransfer2.png}
+
+% ----------------- subsection---------------------
+\subsection{Finding the poisoning}
+\paragraph{}
+The poisoning image must look like a dog but must have all the qualities of it's target (the fish). This will move the decision boundary from the initial doted line to the full line (see diagram). Now any pictures close enough to the targets characteristics will be on the "dog" side of the decision line and therefore be seen as a dog instead of a fish.
+
+\includegraphics[scale=0.3]{DataLinePoison.png}
+\paragraph{}
+In order to create such a poisonous image we must find an image to satisfy this equation with X the image we want to find, t the target, b the initial "dog" image that we will modify and beta the importance we give to the similarity between the original a poisonous image: \\
+\includegraphics[scale=0.3]{Formula.png}
+
+% ----------------- subsection---------------------
+\subsection{Approach}
+The protocol to follow to poison the data set is the following:
+
+\begin{enumerate}
+  \item Choose a target instance to misclassify
+  \item Choose a base instance \& make imperceptible changes to it to get a poison
+  \item Poison is created though an optimization based equation
+  \item Inject poison into training data and let model be trained on poisoned dataset
+\end{enumerate}
+
+% ----------------- subsection---------------------
+\subsection{Algorithm}
+The algorithm to find the image consists of a forward backward iterative splitting procedure to find poison Iteratively. This is achieved by iterating these 2 steps:
+
+
+
+\begin{enumerate}
+  \item minimize distance to the target instance in feature space
+  \item minimize distance from the base instance  in input space
+\end{enumerate}
+\newpage
+% ----------------- section------------------------
+\section{Poisoning Attack Against Support Vector Machines(SVM)}
+\subsection {Overview of Data Poisoning Against SVM}
+\paragraph{}
+Poisoning attack against Support Vector Machines is an instance of causative attacks. Causative attack is an attack which takes advantage of many people's assumption that machine learning algorithms receive well-behaved data. However that is not so. An attacker that is sneaky enough can temper with optimal solutions to the Support Vector Machine by injecting a specific and well crafted attack example. Injection of such point into the training data is called Poisoning Attack.
+
+\paragraph{}
+The attacking scheme is rather simple (See picture below). The point $(x_c,y_c)$ is the desired attack point that will enable the attacker to temper with optimal solutions to the SVM, $D_{tr}$ is the training data, and $\{\alpha_i, b\}$ is the solution to the SVM. As can be seen in the figure, the attack leverages access to the training data. This is more of a realistic assumption than an exploratory attack during which the adversary has access to the model itself. One way to inject some malicious input would be to simply upload the malicious data online or create a set of fake accounts online.
+\paragraph{}
+\includegraphics[scale=0.6]{poisoningpic.PNG}
+
+\subsection{Brief overview of optimization}
+\paragraph{}
+Solving for optimal solutions to SVM can be achieved by mathematical optimization technique called quadratic programming. More precisely we solve a quadratic programming problem using Lagrange multipliers:
+\begin{equation}
+    L_p = \frac{1}{2}||\beta||^{2} + C\sum_{i=1}^{N}\zeta_i - \sum_{i=1}^{N}\alpha_{i}[y_i(x_i^{T}\beta+\beta_0) - (1-\zeta_i)] - \sum_{i=1}^{N}\mu_{i}\zeta_i
+\end{equation}
+\\
+The function described in (3.1) is called the Lagrange Primal Function, abbreviated as $L_P$. Our goal is to minimize this function. We now minimize the above function with respect to $\beta$, $\beta_0$, $\zeta_i$ $\forall$ i to derive the following result. 
+
+\begin{align*} 
+\beta = \sum_{i=1}^{N}\alpha_{i}y_{i}x_{i} \\ 
+0 = \sum_{i=1}^{N}\alpha_{i}y_{i} \\
+\alpha_{i} = C - \mu_{i}\\
+\forall i, i = 1,..,N
+\end{align*}
+\\
+Now we substitute the above back into our primal equation (3.1). Then we have the following:
+\\
+\begin{equation}
+    L_D = \sum_{i=1}^{N}\alpha_{i} - \frac{1}{2}\sum_{i=1}^{N}\sum_{j=1}^{N}\alpha_{i}\alpha_{j}y_{i}y_{j}x_{i}^{T}x_{j}
+\end{equation}
+\\
+The formulation (3.2) is called the Lagrange Dual function.
+\paragraph{}
+Notice that now we have a function we can optimize with respect to only one variable, $\alpha$.
+We optimize the Dual formulation of the Lagrangian subject to: $0 \leq \alpha_i \leq C$ and $\sum_{i=1}^{N}\alpha_iy_i$. There is however one more condition that needs to be satisfied and it is called the KKT (Karsh-Kuhn-Tucker). This condition gives us an extra set of three constraints that need to be satisfied on top of the ones we have seen so far. Here are the extra constraints that come from KKT:
+
+\begin{align*} 
+\alpha_{i}[y_{i}(x_{i}^{T}\beta + \beta_{0}) - (1 - \zeta_{i})] = 0\\
+\mu_{i}\zeta_{i} = 0\\
+y_{i}(x_{i}^{T}\beta + \beta{0}) - (1 - \zeta_{i}) \geq 0
+\end{align*}
+\\
+Keeping all these constraints in mind, we solve the dual formulation of the Lagrangian. Let us say our optimal alpha that optimizes the Dual formulation is: $\alpha_{i}^{*}$. we can now substitute it back into the equation (3.1) and its constraints to derive the solutions for the optimal weights, say $\beta^{*}$:\\
+\begin{equation}
+    \beta^{*} = \sum_{i=1}^{N}\alpha^{*}y_{i}x_{i}
+\end{equation}
+\\
+
+where of course, as can be seen in the original constrains, the coefficients are not zero.
+Here is a pictorial representation of what we described above. The saddle point (coloured in red) is the point at which our function achieves its minimum.\\
+\\
+\paragraph{}
+\includegraphics[scale=0.8]{optimizationPic.PNG}
+
+\subsection{Refresher on SVM}
+\paragraph{}
+We assume that our data is linearly separable and our goal is to build a classifier (linear) to predict unobserved instances' labels.However, needless to say, this is an idea that comes from Perceptron. The goal of SVM is to find the "best" classifier. See below.
+\paragraph{}
+\includegraphics[scale=1.3]{bestseparation.PNG}\\
+\\
+It is clear from the picture which of the two linear boundaries is better. SVM's goal is to find such boundary. Thus more concretely, the goal is to maximize the margin $\rho$ and mathematically we come to the following formulation.
+\paragraph{}
+\begin{align}
+    |\beta^{T}x + \beta_{0}| = 1\\
+    \min\Psi(\beta) = \beta^{T}\beta\\
+    \text{subject to}\\ y_{i}(\beta^{T}x_{i} + \beta_{0}) \geq 1
+\end{align}
+\begin{figure}[h]
+\includegraphics[scale = 0.6, inner]{bestmarginpic.PNG}
+\end{figure}
+\\
+\paragraph{}
+However, we may not always guarantee that our data is perfectly linearly separable. In that case, we only need to slightly modify our formulation. Observe:\\
+\paragraph{}
+\begin{align}
+    \min\Psi(\beta) = \beta^{T}\beta + C\Sigma\zeta_{i}\\
+    \text{subject to}\\
+    y_{i}(\beta^{T}x_{i} + \beta_{0}) \geq 1 - \zeta_{i}\\
+    \zeta_{i} \geq 0
+\end{align}
+\includegraphics[scale=0.5, inner]{bestmarginpic2.PNG}\\
+\\
+Remark: $\Sigma\zeta_{i}$ is also called the hinge loss\\
+\\
+After some algebra, it is easy to see that $(\beta^{T}\beta)^{-1}$ = $||\beta||^{-1}$ is the margin we wish to maximize (we could also say we want to minimize: $||\beta||$ = $(\beta^{T}\beta)$ as suggested above) with the slack variables $\zeta$. Above minimization problem can be translated to the quadratic formulation that was introduced earlier and optimal solutions can be derived in very much the same process illustrated above in our discussion of optimization.
+
+\subsection{Poisoning Attack}
+\paragraph{}
+So what can possibly go wrong? Quite a bit, as we will see from this point on. As mentioned in our earliest discussion of poisoning attacks, a sneaky and intelligent adversary can construct an instance that needs to only wait patiently until collection time of data for the training algorithm to rather maximize the hinge loss on the validation data. Such point can be found using the gradient ascent algorithm. The key is to update the attacking point with the addition of some appropriate gradient after each iteration. Thus, our problem is now to compute such gradient. This can also be formulated as a maximization problem: find $x_c$ such that the hinge loss function is maximized. The process of arriving to the solution is beyond the scope of this summary and one can study the referenced paper to see the derivation process. Nonetheless, we present the high-level idea of the algorithm.
+\subsection{The Algorithm}
+\paragraph{}
+In this section, we introduce the algorithm to compute the attacking point. As will be shown, the highlight of the algorithm is really the computation of the "toxic" gradient u, which will cause the loss function to increase (we often call this gradient ascend for this reason). As mentioned in the earlier section, the derivation and computation of the gradient u is beyond the scope of this summary, but can be seen in detail in the original \textcolor{blue}{\href{https://arxiv.org/pdf/1206.6389.pdf}{paper}}.\\
+\\
+\begin{algorithm}[H]
+\SetAlgoLined
+\KwInput{Training Data ($D_{tr}$), validation data, attack point label, initial attack point ($x_c^{0}$, $y_c$), step size (t)}
+\KwOutput{final attack point}\\
+\\
+\\1. $\{\alpha, b\}$ $\longleftarrow$ solve SVM on $D_{tr}$\\
+\\
+\\2. pick initial attacking point $x_c^{0}$\\
+\\
+\\3. p $\longleftarrow$ 0
+\\
+    \While{L($x_c^{p}$) - L($x_c^{p-1}$) $>$ $\epsilon$}{
+    perform Gradient Ascent\\
+    recompute $\{\alpha, b\}$ on $D_{tr}$ U $\{x_c^{p}, y_c\}$\\
+    compute the "poison" gradient u.\\
+    normalize u\\
+    $x_c^{p+1}$ $\longleftarrow$ $x_c^{p} + tu$
+    }
+    return: $x_c$ = $x_c^{p}$
+    \caption{Find attack point}
+    \end{algorithm}
+With respect to the algorithm above, please keep the following in mind.
+\begin{enumerate}
+  \item Adversary knows the training data used by the learner.
+  \item initial attack point is picked from a region sufficiently deep within the attacking class's margin.
+  \item L($x_c^{j}$) is the loss function with respect to the attacking point at each iteration, j = 1,2,...,m.
+\end{enumerate}
+
+Here is the trajectory of the attacking point as the algorithm proceeds. (This experiment was done on artificial data) 
+\begin{enumerate}
+  \item Heatmap background is the error surface
+  \item Dashed lines (the inner square) is the co-domain of attack points
+  \item Thick black line is the trajectory of the attack point toward the local maximum
+  \item Normal black line is the decision boundary
+  \item Mini black circles are the support vectors
+\end{enumerate}
+\paragraph{}
+\includegraphics[scale=1]{poisontrajectory.PNG}\\
+
+\subsection{Final Result and evaluation}
+\paragraph{}
+We end our discussion with some empirical data on the effectiveness of poisoning attack against SVM. Below is the summary of the results. As can be seen, the experiment was done on three pairs of digits: (7,1), (9,8), and (4,0). There is a stark contrast between the digits before the attack and after the attack as can be seen in the first two columns of the figure. The last column of the figure shows the increasing error over the course of the attack. 
+\paragraph{}
+\includegraphics[scale=0.8]{finalResult.PNG}
+
+\newpage
+\section{References}
+
+B. Biggio, B. Nelson, and P. Laskov. Poisoning attacks against support vector machines. In
+International Conference on Machine Learning (ICML), pages 1467–1474, 2012.\\
+\\
+T. Hastie, R. Tibshirani, and J. Friedman. The Elements of Statistical Learning: Data Mining, Inference, and Prediction\\
+\\
+S. Ben-David and S.Shalev-Schwartz. Understanding Machine Learning: From Theory to Algorithm\\
+\\
+Wu, Cheng-Ju(2017) Poisoning Attacks Against Support Vector Machines[PowerPoint slide 14]. Retrieved from https://people.eecs.berkeley.edu/~roydong/fa17$_$files/EECS290O$_$IEOR290-Student$_$Presentations-Wu-01.pdf
+
+\end{document}
