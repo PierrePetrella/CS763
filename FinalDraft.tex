@@ -336,20 +336,26 @@ With respect to the algorithm above, please keep the following in mind.
   \item L($x_c^{j}$) is the loss function with respect to the attacking point at each iteration, j = 1,2,...,m.
 \end{enumerate}
 
-Here is the trajectory of the attacking point as the algorithm proceeds. (This experiment was done on artificial data) 
-\begin{enumerate}
+Here is the trajectory of the attacking point as the algorithm proceeds. (This experiment was done on artificial data)
+\paragraph{}
+\includegraphics[scale=1.4, inner]{poisontrajectory.PNG}
+\begin{itemize}
   \item Heatmap background is the error surface
   \item Dashed lines (the inner square) is the co-domain of attack points
   \item Thick black line is the trajectory of the attack point toward the local maximum
   \item Normal black line is the decision boundary
   \item Mini black circles are the support vectors
-\end{enumerate}
-\paragraph{}
-\includegraphics[scale=1]{poisontrajectory.PNG}\\
-
+\end{itemize}
+\newpage
 \subsection{Final Result and evaluation}
 \paragraph{}
-We end our discussion with some empirical data on the effectiveness of poisoning attack against SVM. Below is the summary of the results. As can be seen, the experiment was done on three pairs of digits: (7,1), (9,8), and (4,0). There is a stark contrast between the digits before the attack and after the attack as can be seen in the first two columns of the figure. The last column of the figure shows the increasing error over the course of the attack. 
+We end our discussion with some empirical data on the effectiveness of poisoning attack against SVM. Below is the summary of the results of the experiment done on the MNIST dataset. As can be seen, the experiment was done on three pairs of digits:
+\begin{enumerate}
+    \item 7 vs 1
+    \item 9 vs 8
+    \item 4 vs 0
+\end{enumerate}
+There is a stark contrast between the digits before the attack and after the attack as can be seen in the first two columns of the figure. The last column of the figure shows the increasing error over the course of the attack. 
 \paragraph{}
 \includegraphics[scale=0.8]{finalResult.PNG}
 
